@@ -1486,6 +1486,7 @@ dev = [
 ]
 examples = [
     { name = "fastapi" },
+    { name = "httpx" },
     { name = "pipecat-ai", extra = ["deepgram", "websocket"] },
     { name = "python-dotenv" },
     { name = "uvicorn" },
@@ -1494,6 +1495,7 @@ examples = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", marker = "extra == 'examples'", specifier = ">=0.115" },
+    { name = "httpx", marker = "extra == 'examples'", specifier = ">=0.27" },
     { name = "pipecat-ai", specifier = ">=1.12.0,<2" },
     { name = "pipecat-ai", extras = ["cartesia", "deepgram", "openai", "silero", "websocket"], marker = "extra == 'examples'", specifier = ">=1.12.0,<2" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },

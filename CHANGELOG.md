@@ -19,6 +19,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   picks up on an outbound call.
 - Interruption handling via `clear`, and `hangup` on `EndFrame` or `CancelFrame`
   when `auto_hang_up` is left on.
-- A foundational example: a single-file inbound voice bot.
+- Two single-file examples: an inbound bot that answers a number, and an outbound
+  bot that places a Click2Call and holds its greeting until `answered`.
 
 Tested against Pipecat 1.12.0.

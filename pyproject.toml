@@ -31,6 +31,7 @@ dependencies = ["pipecat-ai>=1.12.0,<2"]
 examples = [
   "pipecat-ai[cartesia,deepgram,openai,silero,websocket]>=1.12.0,<2",
   "fastapi>=0.115",
+  "httpx>=0.27",
   "python-dotenv>=1.0",
   "uvicorn>=0.30",
 ]

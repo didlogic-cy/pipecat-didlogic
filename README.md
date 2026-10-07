@@ -87,7 +87,9 @@ all four are learned from `start`.
 
 ### Waiting for an outbound call to be picked up
 
-On an outbound call, hold the greeting until `answered` arrives:
+On an outbound call the platform answers your leg as soon as it has sent `start`,
+which is before the customer's phone has rung. Greeting on connect means talking
+to an empty line, so wait for `answered`:
 
 ```python
 from pipecat.frames.frames import InputTransportMessageFrame, LLMRunFrame
@@ -107,41 +109,67 @@ class GreetWhenAnswered(FrameProcessor):
         await self.push_frame(frame, direction)
 ```
 
-## Run the example
+Put it directly after `transport.input()`. The outbound example below does this.
 
-[`examples/inbound_bot.py`](examples/inbound_bot.py) is a complete inbound voice
-bot in one file: Deepgram for speech-to-text, OpenAI for the reply, Cartesia for
-speech.
+## Examples
 
-1. Install the example's extra dependencies:
+Both are complete bots in one file, using Deepgram for speech-to-text, OpenAI for
+the reply and Cartesia for speech. Install their dependencies and settings once:
 
-   ```bash
-   uv sync --extra examples
-   ```
+```bash
+uv sync --extra examples
+cp .env.example .env     # then fill it in
+```
 
-2. Copy `.env.example` to `.env` and fill in the three API keys.
+Both need a public `wss://` address, because the platform dials your endpoint
+rather than the other way round. In development a tunnel is the usual way:
 
-3. Run it:
+```bash
+ngrok http 8080
+```
 
-   ```bash
-   uv run examples/inbound_bot.py
-   ```
+### Inbound: a bot that answers your number
 
-4. Give it a public `wss://` address. The platform dials your endpoint, so it has
-   to be reachable from the internet — in development, a tunnel is the usual way:
+[`examples/inbound_bot.py`](examples/inbound_bot.py) needs the three AI keys in
+`.env` and nothing else.
 
-   ```bash
-   ngrok http 8080
-   ```
+```bash
+uv run examples/inbound_bot.py
+```
 
-5. In the DIDLogic portal, add a **WebSocket** destination to one of your numbers
-   pointing at `wss://<your-tunnel-host>/ws`.
+In the DIDLogic portal, add a **WebSocket** destination to one of your numbers
+pointing at `wss://<your-tunnel-host>/ws`, then call the number. You should see
+the `start` message logged, the transcript of what you say, and hear the reply.
 
-Call the number. You should see the `start` message logged, then the transcript
-of what you say, and hear the bot reply.
+### Outbound: a bot that places the call
 
-WebSocket destinations are enabled per account. If the type is missing from the
-destination list, ask support to turn on voice streaming for your account.
+[`examples/outbound_bot.py`](examples/outbound_bot.py) is the agent leg of a
+Click2Call. It also needs `DIDLOGIC_API_TOKEN`, `DIDLOGIC_SIP_ACCOUNT` and
+`PUBLIC_WSS_URL` in `.env`.
+
+```bash
+uv run examples/outbound_bot.py
+```
+
+Then ask it to dial someone:
+
+```bash
+curl -X POST http://localhost:8080/call \
+  -H 'Content-Type: application/json' \
+  -d '{"b_number": "12065550123"}'
+```
+
+DIDLogic connects the bot first and dials the number second. The bot stays quiet
+until `answered` says the person has picked up, then opens the conversation.
+
+The SIP account is required for a stream call: the outbound leg still bills and
+routes against one, even though the audio goes to your endpoint.
+
+### If the option is missing
+
+WebSocket destinations and `a_type: stream` are enabled per account. If the
+destination type is absent from the portal, or the API answers `422
+a_type_unsupported`, ask support to turn on voice streaming for your account.
 
 ## Development
 
