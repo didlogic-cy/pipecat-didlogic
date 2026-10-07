@@ -88,7 +88,18 @@ initial `accepted` state; `GET /api/v1/click2call/{id}` follows its progress.
 You should see `start` logged at once, then `Customer answered` when the phone is
 picked up, and the bot opens the conversation.
 
+## Testing against a staging environment
+
+Set `DIDLOGIC_API_BASE` in `.env` to that environment's API, and use a token
+issued there. Left unset, calls go to production.
+
 ## Troubleshooting
+
+**`401 Unauthorized`.** The token does not belong to the environment in
+`DIDLOGIC_API_BASE` — most often a staging token sent to production, which is the
+default. The response body says which status came back, so check it rather than
+the server log.
+
 
 **The bot talks to itself and the customer hears nothing of the opening.**
 `GreetWhenAnswered` is missing or in the wrong place. It belongs directly after

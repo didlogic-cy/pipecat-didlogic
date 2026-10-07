@@ -14,7 +14,7 @@ import os
 import httpx
 from pydantic import BaseModel
 
-API_BASE = "https://didlogic.com/api/v1"
+API_BASE = os.getenv("DIDLOGIC_API_BASE", "https://didlogic.com/api/v1")
 
 
 class DialoutRequest(BaseModel):
@@ -33,7 +33,9 @@ async def place_call(b_number: str) -> dict:
         The call resource, in its initial ``accepted`` state.
 
     Raises:
-        httpx.HTTPStatusError: If the API refuses the call.
+        httpx.HTTPStatusError: If the API refuses the call. The caller is
+            expected to handle it; ``server.py`` turns it into a response
+            carrying the upstream status and body.
     """
     payload = {
         "a_type": "stream",
