@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pipecat-didlogic"
+version = "0.1.0"
+description = "DIDLogic WebSocket call serializer for Pipecat"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "BSD-2-Clause"
+license-files = ["LICENSE"]
+authors = [{ name = "DIDLogic", email = "support@didlogic.com" }]
+keywords = ["didlogic", "pipecat", "voice", "telephony", "websocket", "audio", "serializer"]
+
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Operating System :: OS Independent",
+  "Topic :: Communications :: Telephony",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = ["pipecat-ai>=1.12.0,<2"]
+
+[project.optional-dependencies]
+examples = [
+  "pipecat-ai[cartesia,deepgram,openai,silero,websocket]>=1.12.0,<2",
+  "fastapi>=0.115",
+  "python-dotenv>=1.0",
+  "uvicorn>=0.30",
+]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "ruff>=0.8"]
+
+[project.urls]
+Homepage = "https://github.com/didlogic-engineering/pipecat-didlogic"
+Repository = "https://github.com/didlogic-engineering/pipecat-didlogic"
+Issues = "https://github.com/didlogic-engineering/pipecat-didlogic/issues"
+Documentation = "https://docs.didlogic.com/docs/guides/apps-developer-tools/websocket-calls"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+  "ASYNC",
+  "B",
+  "D",
+  "F",
+  "I",
+  "RUF006",
+  "UP",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
