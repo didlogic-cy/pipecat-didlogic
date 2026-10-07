@@ -31,9 +31,9 @@ dependencies = ["pipecat-ai>=1.12.0,<2"]
 dev = ["pytest>=8", "pytest-asyncio>=0.24", "ruff>=0.8"]
 
 [project.urls]
-Homepage = "https://github.com/didlogic-engineering/pipecat-didlogic"
-Repository = "https://github.com/didlogic-engineering/pipecat-didlogic"
-Issues = "https://github.com/didlogic-engineering/pipecat-didlogic/issues"
+Homepage = "https://github.com/didlogic-cy/pipecat-didlogic"
+Repository = "https://github.com/didlogic-cy/pipecat-didlogic"
+Issues = "https://github.com/didlogic-cy/pipecat-didlogic/issues"
 Documentation = "https://docs.didlogic.com/docs/guides/apps-developer-tools/websocket-calls"
 
 [tool.setuptools]
