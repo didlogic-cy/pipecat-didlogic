@@ -113,63 +113,21 @@ Put it directly after `transport.input()`. The outbound example below does this.
 
 ## Examples
 
-Both are complete bots in one file, using Deepgram for speech-to-text, OpenAI for
-the reply and Cartesia for speech. Install their dependencies and settings once:
+[`examples/`](examples/) has two complete bots, each self-contained with its own
+dependencies and setup instructions:
 
-```bash
-uv sync --extra examples
-cp .env.example .env     # then fill it in
-```
+- **[`examples/inbound/`](examples/inbound/)** — a bot that answers calls to one
+  of your numbers.
+- **[`examples/outbound/`](examples/outbound/)** — a bot that places the call
+  through Click2Call and waits for `answered` before speaking.
 
-Both need a public `wss://` address, because the platform dials your endpoint
-rather than the other way round. In development a tunnel is the usual way:
-
-```bash
-ngrok http 8080
-```
-
-### Inbound: a bot that answers your number
-
-[`examples/inbound_bot.py`](examples/inbound_bot.py) needs the three AI keys in
-`.env` and nothing else.
-
-```bash
-uv run examples/inbound_bot.py
-```
-
-In the DIDLogic portal, add a **WebSocket** destination to one of your numbers
-pointing at `wss://<your-tunnel-host>/ws`, then call the number. You should see
-the `start` message logged, the transcript of what you say, and hear the reply.
-
-### Outbound: a bot that places the call
-
-[`examples/outbound_bot.py`](examples/outbound_bot.py) is the agent leg of a
-Click2Call. It also needs `DIDLOGIC_API_TOKEN`, `DIDLOGIC_SIP_ACCOUNT` and
-`PUBLIC_WSS_URL` in `.env`.
-
-```bash
-uv run examples/outbound_bot.py
-```
-
-Then ask it to dial someone:
-
-```bash
-curl -X POST http://localhost:8080/call \
-  -H 'Content-Type: application/json' \
-  -d '{"b_number": "12065550123"}'
-```
-
-DIDLogic connects the bot first and dials the number second. The bot stays quiet
-until `answered` says the person has picked up, then opens the conversation.
-
-The SIP account is required for a stream call: the outbound leg still bills and
-routes against one, even though the audio goes to your endpoint.
-
-### If the option is missing
+Each runs with `uv sync && uv run server.py` in its own directory. Both need a
+public `wss://` address, because the platform dials your endpoint rather than the
+other way round.
 
 WebSocket destinations and `a_type: stream` are enabled per account. If the
-destination type is absent from the portal, or the API answers `422
-a_type_unsupported`, ask support to turn on voice streaming for your account.
+destination type is absent from the portal, or the API answers
+`422 a_type_unsupported`, ask support to turn on voice streaming for your account.
 
 ## Development
 

@@ -4,31 +4,27 @@
 # SPDX-License-Identifier: BSD-2-Clause
 #
 
-"""Inbound voice bot on a DIDLogic WebSocket destination.
+"""bot.py
 
-Run it, point a DIDLogic WebSocket destination at ``wss://<your-host>/ws``, and
-call the number. The bot greets the caller and answers in speech.
+The pipeline for the agent leg of an outbound DIDLogic call.
 
-The pipeline is the usual telephony shape::
-
-    WebSocket in -> Deepgram STT -> OpenAI LLM -> Cartesia TTS -> WebSocket out
-
-``DidlogicFrameSerializer`` reads the ``start`` message off the socket itself, so
-nothing has to be parsed before the pipeline is built.
+The one thing that differs from inbound: the platform answers this leg as soon as
+it has sent ``start``, which is before the customer's phone has rung. A bot that
+greets on connect talks to an empty line and loses its opening words, so
+``GreetWhenAnswered`` holds the first turn until the ``answered`` event arrives.
 """
 
 import os
 
-import uvicorn
-from dotenv import load_dotenv
-from fastapi import FastAPI, WebSocket
+from loguru import logger
 from pipecat.audio.vad.silero import SileroVADAnalyzer
-from pipecat.frames.frames import LLMRunFrame
+from pipecat.frames.frames import Frame, InputTransportMessageFrame, LLMRunFrame
 from pipecat.pipeline.pipeline import Pipeline
 from pipecat.pipeline.runner import PipelineRunner
 from pipecat.pipeline.task import PipelineParams, PipelineTask
 from pipecat.processors.aggregators.llm_context import LLMContext
 from pipecat.processors.aggregators.llm_response_universal import LLMContextAggregatorPair
+from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 from pipecat.services.cartesia.tts import CartesiaTTSService
 from pipecat.services.deepgram.stt import DeepgramSTTService
 from pipecat.services.openai.llm import OpenAILLMService
@@ -36,24 +32,38 @@ from pipecat.transports.websocket.fastapi import (
     FastAPIWebsocketParams,
     FastAPIWebsocketTransport,
 )
-
 from pipecat_didlogic import DidlogicFrameSerializer
 
-load_dotenv()
-
-app = FastAPI()
-
 SYSTEM_PROMPT = (
-    "You are a helpful telephone assistant. Keep your answers to one or two "
+    "You are calling on behalf of a shop to confirm a delivery time. Open by "
+    "saying who you are and why you are calling. Keep every answer to one or two "
     "sentences, and speak them plainly: everything you say is read aloud."
 )
 
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    """Answer one DIDLogic call and run the bot on it."""
-    await websocket.accept()
+class GreetWhenAnswered(FrameProcessor):
+    """Start the conversation when the customer picks up, not when the socket opens."""
 
+    async def process_frame(self, frame: Frame, direction: FrameDirection):
+        """Pass every frame through, and queue the first turn on ``answered``."""
+        await super().process_frame(frame, direction)
+
+        if (
+            isinstance(frame, InputTransportMessageFrame)
+            and frame.message.get("event") == "answered"
+        ):
+            logger.info("Customer answered - starting the conversation")
+            await self.push_frame(LLMRunFrame())
+
+        await self.push_frame(frame, direction)
+
+
+async def run_bot(websocket):
+    """Run the bot on the agent leg DIDLogic has just connected.
+
+    Args:
+        websocket: The accepted FastAPI WebSocket the platform connected.
+    """
     transport = FastAPIWebsocketTransport(
         websocket=websocket,
         params=FastAPIWebsocketParams(
@@ -78,6 +88,7 @@ async def websocket_endpoint(websocket: WebSocket):
     pipeline = Pipeline(
         [
             transport.input(),
+            GreetWhenAnswered(),
             stt,
             context_aggregator.user(),
             llm,
@@ -89,20 +100,8 @@ async def websocket_endpoint(websocket: WebSocket):
 
     task = PipelineTask(pipeline, params=PipelineParams(enable_metrics=True))
 
-    @transport.event_handler("on_client_connected")
-    async def on_client_connected(transport, client):
-        await task.queue_frames([LLMRunFrame()])
-
     @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):
         await task.cancel()
 
     await PipelineRunner(handle_sigint=False).run(task)
-
-
-if __name__ == "__main__":
-    uvicorn.run(
-        app,
-        host=os.getenv("HOST", "0.0.0.0"),
-        port=int(os.getenv("PORT", "8080")),
-    )
