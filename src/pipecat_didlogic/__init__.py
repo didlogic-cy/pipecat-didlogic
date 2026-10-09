@@ -13,4 +13,4 @@ a Pipecat bot can answer and speak on a DIDLogic call.
 from .serializer import DidlogicFrameSerializer
 
 __all__ = ["DidlogicFrameSerializer"]
-__version__ = "0.1.0"
+__version__ = "1.0.0"

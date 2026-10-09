@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pipecat-didlogic"
-version = "0.1.0"
+version = "1.0.0"
 description = "DIDLogic WebSocket call serializer for Pipecat"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -14,7 +14,7 @@ authors = [{ name = "DIDLogic", email = "support@didlogic.com" }]
 keywords = ["didlogic", "pipecat", "voice", "telephony", "websocket", "audio", "serializer"]
 
 classifiers = [
-  "Development Status :: 4 - Beta",
+  "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
