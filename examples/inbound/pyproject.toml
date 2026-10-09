@@ -1,7 +1,7 @@
 [project]
 name = "didlogic-chatbot-inbound"
 version = "0.1.0"
-description = "Inbound DIDLogic WebSocket call example for Pipecat"
+description = "Inbound didlogic WebSocket call example for Pipecat"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

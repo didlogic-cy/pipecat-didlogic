@@ -24,7 +24,7 @@ class DialoutRequest(BaseModel):
 
 
 async def place_call(b_number: str) -> dict:
-    """Ask DIDLogic to dial a number with this server as the agent leg.
+    """Ask didlogic to dial a number with this server as the agent leg.
 
     Args:
         b_number: The number to call, E.164 digits without a leading plus.

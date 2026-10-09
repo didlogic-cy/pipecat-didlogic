@@ -6,7 +6,7 @@
 
 """bot.py
 
-The pipeline for the agent leg of an outbound DIDLogic call.
+The pipeline for the agent leg of an outbound didlogic call.
 
 The one thing that differs from inbound: the platform answers this leg as soon as
 it has sent ``start``, which is before the customer's phone has rung. A bot that
@@ -59,7 +59,7 @@ class GreetWhenAnswered(FrameProcessor):
 
 
 async def run_bot(websocket):
-    """Run the bot on the agent leg DIDLogic has just connected.
+    """Run the bot on the agent leg didlogic has just connected.
 
     Args:
         websocket: The accepted FastAPI WebSocket the platform connected.

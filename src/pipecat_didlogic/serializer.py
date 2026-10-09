@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 #
 
-"""DIDLogic WebSocket call serializer for Pipecat."""
+"""didlogic WebSocket call serializer for Pipecat."""
 
 import base64
 import json
@@ -30,12 +30,12 @@ from pipecat.serializers.base_serializer import FrameSerializer
 
 
 class DidlogicFrameSerializer(FrameSerializer):
-    """Serializer for the DIDLogic WebSocket call protocol.
+    """Serializer for the didlogic WebSocket call protocol.
 
-    DIDLogic connects to the bot, which is therefore a WebSocket server. The same
+    didlogic connects to the bot, which is therefore a WebSocket server. The same
     protocol carries both directions of call:
 
-    - inbound, where somebody dialled a DIDLogic number pointed at this endpoint
+    - inbound, where somebody dialled a didlogic number pointed at this endpoint
     - outbound, placed through the Click2Call API with ``a_type: "stream"``
 
     Messages are JSON text frames. Audio is PCM16, 24 kHz, mono, base64 in
@@ -174,7 +174,7 @@ class DidlogicFrameSerializer(FrameSerializer):
 
     @property
     def to_number(self) -> str | None:
-        """The called party: the DIDLogic number dialled, or the outbound destination."""
+        """The called party: the didlogic number dialled, or the outbound destination."""
         return self._to_number
 
     @property
@@ -204,7 +204,7 @@ class DidlogicFrameSerializer(FrameSerializer):
         self._sample_rate = self._params.sample_rate or setup.audio_in_sample_rate
 
     async def serialize(self, frame: Frame) -> str | bytes | None:
-        """Serialize a Pipecat frame into a DIDLogic message.
+        """Serialize a Pipecat frame into a didlogic message.
 
         Args:
             frame: The Pipecat frame to serialize.
@@ -240,7 +240,7 @@ class DidlogicFrameSerializer(FrameSerializer):
         return None
 
     async def deserialize(self, data: str | bytes) -> Frame | None:
-        """Deserialize a DIDLogic message into a Pipecat frame.
+        """Deserialize a didlogic message into a Pipecat frame.
 
         Args:
             data: The raw WebSocket message. The protocol is JSON text only;
@@ -267,18 +267,18 @@ class DidlogicFrameSerializer(FrameSerializer):
 
         if event == "answered":
             self._answered = True
-            logger.debug(f"DIDLogic call {self._call_id} answered by the destination")
+            logger.debug(f"didlogic call {self._call_id} answered by the destination")
             return InputTransportMessageFrame(message=message)
 
         if event == "dtmf":
             return self._deserialize_dtmf(message)
 
         if event == "stop":
-            logger.debug(f"DIDLogic call {self._call_id} ended")
+            logger.debug(f"didlogic call {self._call_id} ended")
             return InputTransportMessageFrame(message=message)
 
         # The protocol is extensible and says to ignore what you do not know.
-        logger.debug(f"Ignoring unknown DIDLogic event: {event}")
+        logger.debug(f"Ignoring unknown didlogic event: {event}")
         return None
 
     def _parse(self, data: str | bytes) -> dict[str, Any] | None:
@@ -286,15 +286,15 @@ class DidlogicFrameSerializer(FrameSerializer):
             try:
                 data = data.decode("utf-8")
             except UnicodeDecodeError:
-                logger.warning("Discarding a DIDLogic message that is not UTF-8 text")
+                logger.warning("Discarding a didlogic message that is not UTF-8 text")
                 return None
         try:
             message = json.loads(data)
         except json.JSONDecodeError:
-            logger.warning(f"Failed to parse JSON message from DIDLogic: {data}")
+            logger.warning(f"Failed to parse JSON message from didlogic: {data}")
             return None
         if not isinstance(message, dict):
-            logger.warning(f"Discarding a DIDLogic message that is not an object: {data}")
+            logger.warning(f"Discarding a didlogic message that is not an object: {data}")
             return None
         return message
 
@@ -307,13 +307,13 @@ class DidlogicFrameSerializer(FrameSerializer):
         wire_rate = message.get("sample_rate")
         if isinstance(wire_rate, int) and wire_rate != self._didlogic_sample_rate:
             logger.debug(
-                f"DIDLogic call {self._call_id} is {wire_rate} Hz, "
+                f"didlogic call {self._call_id} is {wire_rate} Hz, "
                 f"not the configured {self._didlogic_sample_rate} Hz; following the call"
             )
             self._didlogic_sample_rate = wire_rate
 
         logger.debug(
-            f"DIDLogic call {self._call_id} started: "
+            f"didlogic call {self._call_id} started: "
             f"{self._from_number} -> {self._to_number} "
             f"({self._direction or 'inbound'})"
         )
@@ -327,7 +327,7 @@ class DidlogicFrameSerializer(FrameSerializer):
         try:
             audio = base64.b64decode(payload)
         except (ValueError, TypeError):
-            logger.warning("Discarding a DIDLogic media frame with a malformed payload")
+            logger.warning("Discarding a didlogic media frame with a malformed payload")
             return None
 
         resampled = await self._input_resampler.resample(

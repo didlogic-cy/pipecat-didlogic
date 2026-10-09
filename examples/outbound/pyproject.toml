@@ -1,7 +1,7 @@
 [project]
 name = "didlogic-chatbot-outbound"
 version = "0.1.0"
-description = "Outbound DIDLogic Click2Call example for Pipecat"
+description = "Outbound didlogic Click2Call example for Pipecat"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

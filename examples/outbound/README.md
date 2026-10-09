@@ -1,6 +1,6 @@
-# DIDLogic chatbot: outbound
+# didlogic chatbot: outbound
 
-A bot that places the call: your server asks DIDLogic to dial a number, and the
+A bot that places the call: your server asks didlogic to dial a number, and the
 bot is the agent leg.
 
 ## How it works
@@ -8,7 +8,7 @@ bot is the agent leg.
 1. You `POST /call` with a number.
 2. The server calls Click2Call with `a_type: stream`, pointing `a_endpoint` at its
    own `/ws`.
-3. DIDLogic opens a WebSocket to `/ws` and sends `start`, then dials the customer.
+3. didlogic opens a WebSocket to `/ws` and sends `start`, then dials the customer.
 4. **The bot's leg is answered before the customer's phone rings.** The bot stays
    quiet until the `answered` event says the customer picked up, then opens the
    conversation.
@@ -22,7 +22,7 @@ means the opening words are spoken to a line nobody is on yet.
 ```
 POST /call -> server.py -> Click2Call API
                                   |
-Customer <-> DIDLogic <-> WebSocket <-> server.py -> bot.py -> Deepgram / OpenAI / Cartesia
+Customer <-> didlogic <-> WebSocket <-> server.py -> bot.py -> Deepgram / OpenAI / Cartesia
 ```
 
 - `server.py` places calls and accepts the WebSocket
@@ -31,7 +31,7 @@ Customer <-> DIDLogic <-> WebSocket <-> server.py -> bot.py -> Deepgram / OpenAI
 
 ## Prerequisites
 
-### DIDLogic
+### didlogic
 
 - An account with voice streaming enabled. If the API answers
   `422 a_type_unsupported`, it is not on yet — ask support.
@@ -48,7 +48,7 @@ Keys for [Deepgram](https://deepgram.com), [OpenAI](https://openai.com) and
 
 - Python 3.11 or newer
 - [uv](https://docs.astral.sh/uv/)
-- A public address for this server, since DIDLogic dials it.
+- A public address for this server, since didlogic dials it.
   [ngrok](https://ngrok.com) is the usual choice in development.
 
 ## Setup
@@ -106,7 +106,7 @@ the server log.
 `transport.input()`, so it sees the `answered` event before anything else.
 
 **`422 invalid_a_endpoint`.** `PUBLIC_WSS_URL` must be a `wss://` URL on a public
-host. DIDLogic checks it is reachable before placing the call, so a stale tunnel
+host. didlogic checks it is reachable before placing the call, so a stale tunnel
 host fails here rather than silently.
 
 **`422 unknown_sip_account`.** `DIDLOGIC_SIP_ACCOUNT` must be one of your own

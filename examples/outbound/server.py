@@ -6,7 +6,7 @@
 
 """server.py
 
-Server for outbound DIDLogic calls: ``POST /call`` places one through
+Server for outbound didlogic calls: ``POST /call`` places one through
 Click2Call, and the platform connects the agent leg back to ``/ws``.
 """
 

@@ -6,7 +6,7 @@
 
 """server.py
 
-WebSocket server for inbound DIDLogic calls. A WebSocket destination on one of
+WebSocket server for inbound didlogic calls. A WebSocket destination on one of
 your numbers points at ``/ws``; every call that arrives gets a bot.
 """
 

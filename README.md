@@ -1,12 +1,12 @@
 # pipecat-didlogic
 
-DIDLogic WebSocket call support for [Pipecat](https://github.com/pipecat-ai/pipecat).
+didlogic WebSocket call support for [Pipecat](https://github.com/pipecat-ai/pipecat).
 
-`DidlogicFrameSerializer` converts between Pipecat audio frames and the DIDLogic
-voice-stream protocol, so a Pipecat bot can take a call on a DIDLogic number — or
+`DidlogicFrameSerializer` converts between Pipecat audio frames and the didlogic
+voice-stream protocol, so a Pipecat bot can take a call on a didlogic number — or
 be the agent leg of an outbound call — and speak on it.
 
-Maintained by DIDLogic. We run the platform this talks to.
+Maintained by didlogic. We run the platform this talks to.
 
 ## What it handles
 

@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pipecat-didlogic"
-version = "1.0.1"
-description = "DIDLogic WebSocket call serializer for Pipecat"
+version = "1.0.2"
+description = "didlogic WebSocket call serializer for Pipecat"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "BSD-2-Clause"

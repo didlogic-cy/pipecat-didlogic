@@ -1,6 +1,6 @@
-# DIDLogic voice bot examples
+# didlogic voice bot examples
 
-Two voice bots built on `pipecat-didlogic`, covering both directions a DIDLogic
+Two voice bots built on `pipecat-didlogic`, covering both directions a didlogic
 stream call can run in.
 
 ## Examples
@@ -12,7 +12,7 @@ the number points at your server.
 
 ### [Outbound](./outbound/)
 
-The bot places the call. Your server asks Click2Call to dial a number, DIDLogic
+The bot places the call. Your server asks Click2Call to dial a number, didlogic
 connects the bot as the agent leg, and the bot speaks once the customer picks up.
 
 ## Architecture
@@ -20,10 +20,10 @@ connects the bot as the agent leg, and the bot speaks once the customer picks up
 Both share the same shape:
 
 ```
-Phone call <-> DIDLogic <-> voice stream (WebSocket) <-> Pipecat <-> AI services
+Phone call <-> didlogic <-> voice stream (WebSocket) <-> Pipecat <-> AI services
 ```
 
-- **DIDLogic** routes the call and carries the audio
+- **didlogic** routes the call and carries the audio
 - **The voice stream** is PCM16 at 24 kHz in 10 ms frames, base64 inside JSON
 - **`DidlogicFrameSerializer`** translates that to and from Pipecat frames
 - **AI services** here are Deepgram (STT), OpenAI (LLM) and Cartesia (TTS)
@@ -33,7 +33,7 @@ Phone call <-> DIDLogic <-> voice stream (WebSocket) <-> Pipecat <-> AI services
 Inbound, the caller is already on the line when the socket opens, so the bot can
 greet immediately.
 
-Outbound, DIDLogic answers the bot's leg as soon as it has sent `start` — before
+Outbound, didlogic answers the bot's leg as soon as it has sent `start` — before
 the customer's phone has rung. Greeting then means talking to nobody. The
 outbound example waits for the `answered` event instead, which is what says the
 person has picked up.
@@ -41,5 +41,5 @@ person has picked up.
 ## Getting help
 
 - Per-example setup: the README in [`inbound/`](./inbound/) and [`outbound/`](./outbound/)
-- Protocol reference: [DIDLogic WebSocket calls](https://docs.didlogic.com/docs/guides/apps-developer-tools/websocket-calls)
+- Protocol reference: [didlogic WebSocket calls](https://docs.didlogic.com/docs/guides/apps-developer-tools/websocket-calls)
 - Pipecat documentation: [docs.pipecat.ai](https://docs.pipecat.ai)

@@ -6,7 +6,7 @@
 
 """bot.py
 
-The pipeline for an inbound DIDLogic call: speech in, a spoken reply out.
+The pipeline for an inbound didlogic call: speech in, a spoken reply out.
 
 ``server.py`` accepts the WebSocket and hands it here.
 """
@@ -36,7 +36,7 @@ SYSTEM_PROMPT = (
 
 
 async def run_bot(websocket):
-    """Run the bot on an accepted DIDLogic WebSocket connection.
+    """Run the bot on an accepted didlogic WebSocket connection.
 
     Args:
         websocket: The accepted FastAPI WebSocket the platform connected.
