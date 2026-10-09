@@ -10,8 +10,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 
 - The company name is written `didlogic` throughout the README, examples and
-  docstrings, matching how the brand is styled. Copyright notices keep the
-  registered spelling.
+  docstrings, matching how the brand is styled.
+- Copyright notices name the legal entity, `DID Logic PTE. LTD.`, as the main
+  website does.
 
 ## [1.0.1] - 2026-10-09
 

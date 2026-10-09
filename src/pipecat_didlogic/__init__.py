@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2026, DIDLogic
+# Copyright (c) 2026, DID Logic PTE. LTD.
 #
 # SPDX-License-Identifier: BSD-2-Clause
 #
