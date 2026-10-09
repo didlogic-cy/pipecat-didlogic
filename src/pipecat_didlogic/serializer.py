@@ -32,71 +32,72 @@ from pipecat.serializers.base_serializer import FrameSerializer
 class DidlogicFrameSerializer(FrameSerializer):
     """Serializer for the DIDLogic WebSocket call protocol.
 
-        DIDLogic connects to the bot, which is therefore a WebSocket server. The same
-        protocol carries both directions of call:
+    DIDLogic connects to the bot, which is therefore a WebSocket server. The same
+    protocol carries both directions of call:
 
-        - inbound, where somebody dialled a DIDLogic number pointed at this endpoint
-        - outbound, placed through the Click2Call API with ``a_type: "stream"``
+    - inbound, where somebody dialled a DIDLogic number pointed at this endpoint
+    - outbound, placed through the Click2Call API with ``a_type: "stream"``
 
-        Messages are JSON text frames. Audio is PCM16, 24 kHz, mono, base64 in
-        ``payload``. The platform sends one 10 ms frame per ``media`` message; audio
-        sent back may be any length and is buffered on the platform side, so this
-        serializer does not chunk its output.
+    Messages are JSON text frames. Audio is PCM16, 24 kHz, mono, base64 in
+    ``payload``. The platform sends one 10 ms frame per ``media`` message; audio
+    sent back may be any length and is buffered on the platform side, so this
+    serializer does not chunk its output.
 
-        The call is answered as soon as the platform has sent ``start``, so audio
-        arrives without the bot being asked to announce itself.
+    The call is answered as soon as the platform has sent ``start``, so audio
+    arrives without the bot being asked to announce itself.
 
-        On an **outbound** call, audio flows while the destination is still ringing:
-        the bot hears ringback, and anything it says goes into a phone nobody has
-        picked up. ``answered`` is what says the person is there. Gate the greeting on
-        it — see ``is_outbound`` and the example below.
+    On an **outbound** call, audio flows while the destination is still ringing:
+    the bot hears ringback, and anything it says goes into a phone nobody has
+    picked up. ``answered`` is what says the person is there. Gate the greeting on
+    it — see ``is_outbound`` and the example below.
 
-        Example::
+    Example::
 
-            serializer = DidlogicFrameSerializer()
+        serializer = DidlogicFrameSerializer()
 
-            transport = FastAPIWebsocketTransport(
-                websocket=websocket,
-                params=FastAPIWebsocketParams(
-                    audio_in_enabled=True,
-                    audio_out_enabled=True,
-                    add_wav_header=False,
-                    vad_analyzer=SileroVADAnalyzer(),
-                    serializer=serializer,
-                ),
-            )
+        transport = FastAPIWebsocketTransport(
+            websocket=websocket,
+            params=FastAPIWebsocketParams(
+                audio_in_enabled=True,
+                audio_out_enabled=True,
+                add_wav_header=False,
+                vad_analyzer=SileroVADAnalyzer(),
+                serializer=serializer,
+            ),
+        )
 
-        With the development runner, select the ``websocket`` transport and name this
-        serializer in the params factory::
+    With the development runner, select the ``websocket`` transport and name this
+    serializer in the params factory::
 
-            transport_params = {
-                "websocket": lambda: FastAPIWebsocketParams(
-                    audio_in_enabled=True,
-                    audio_out_enabled=True,
-                    add_wav_header=False,
-                    serializer=DidlogicFrameSerializer(),
-                ),
-            }
+        transport_params = {
+            "websocket": lambda: FastAPIWebsocketParams(
+                audio_in_enabled=True,
+                audio_out_enabled=True,
+                add_wav_header=False,
+                serializer=DidlogicFrameSerializer(),
+            ),
+        }
 
-    Anything that reads the socket before the transport does — ``parse_telephony_websocket``
-        among them — consumes the ``start`` this serializer otherwise learns the call
-        from. Pass what it parsed to the constructor; audio, DTMF, ``answered`` and
-        ``stop`` are unaffected either way.
+    Anything that reads the socket before the transport does consumes the
+    ``start`` this serializer otherwise learns the call from — a server that
+    inspects the handshake itself, for instance. Pass what it parsed to the
+    constructor; audio, DTMF, ``answered`` and ``stop`` are unaffected either
+    way.
 
-        To greet only once the far end is listening::
+    To greet only once the far end is listening::
 
-            class Greeter(FrameProcessor):
-                async def process_frame(self, frame, direction):
-                    await super().process_frame(frame, direction)
-                    if (
-                        isinstance(frame, InputTransportMessageFrame)
-                        and frame.message.get("event") == "answered"
-                    ):
-                        await self.push_frame(LLMRunFrame())
-                    await self.push_frame(frame, direction)
+        class Greeter(FrameProcessor):
+            async def process_frame(self, frame, direction):
+                await super().process_frame(frame, direction)
+                if (
+                    isinstance(frame, InputTransportMessageFrame)
+                    and frame.message.get("event") == "answered"
+                ):
+                    await self.push_frame(LLMRunFrame())
+                await self.push_frame(frame, direction)
 
-        On an inbound call the caller is already on the line, so the greeting belongs
-        right after the pipeline starts instead.
+    On an inbound call the caller is already on the line, so the greeting belongs
+    right after the pipeline starts instead.
     """
 
     class InputParams(FrameSerializer.InputParams):
@@ -130,9 +131,8 @@ class DidlogicFrameSerializer(FrameSerializer):
         Args:
             params: Configuration parameters.
             call_id: The call's identifier, for a caller that read ``start``
-                before building the serializer. The development runner does,
-                because it picks the provider from the handshake. Left unset, all
-                four are learned from ``start`` instead.
+                before building the serializer. Left unset, all four are learned
+                from ``start`` instead.
             from_number: The calling party, on the same terms as ``call_id``.
             to_number: The called party, on the same terms as ``call_id``.
             direction: ``"outbound"`` on an outbound call, same terms again.
