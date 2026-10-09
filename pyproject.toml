@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = "BSD-2-Clause"
 license-files = ["LICENSE"]
-authors = [{ name = "DIDLogic", email = "support@didlogic.com" }]
+authors = [{ name = "didlogic", email = "support@didlogic.com" }]
 keywords = ["didlogic", "pipecat", "voice", "telephony", "websocket", "audio", "serializer"]
 
 classifiers = [
